@@ -1,0 +1,7 @@
+db.sqlite3
+
+.vscode
+
+api/__pycache__
+gql/__pycache__
+users/__pycache__
