@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.utils.translation import gettext, gettext_lazy as _
-
+from django.utils.safestring import mark_safe
 # Register your models here.
-from gql.models import Tag, Category, Project
+from .models import Tag, Category, Project
 
 # タグ
 @admin.register(Tag)
@@ -26,5 +26,7 @@ class AdminProject(admin.ModelAdmin):
 # Category
 @admin.register(Category)
 class AdminCategory(admin.ModelAdmin):
-    list_display = ['name']
-    search_fields = ['name']
+    list_display = ['name','color','showcolor']
+    search_fields = ['name','color']
+    def showcolor(self, obj):
+        return mark_safe('<b style="background:{};">{}</b>'.format('#'+obj.color, '#'+obj.color))

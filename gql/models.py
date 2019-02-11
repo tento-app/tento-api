@@ -11,6 +11,8 @@ from django.utils import timezone
 class Tag(models.Model):
     alphanumeric = RegexValidator(r'^[0-9a-z+]*$', '小英数字+だけね')
     name = models.CharField(_('タグ'), max_length=150, blank=True, validators=[alphanumeric])
+    # vcolor = RegexValidator(r'^[0-9a-zA-Z]*$', '英数字だけね')
+    # color = models.CharField(_('カラーコード'), max_length=6, blank=True, validators=[vcolor])
 
     def __str__(self):
         return self.name
@@ -21,7 +23,8 @@ class Tag(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
-
+    vcolor = RegexValidator(r'^[0-9a-zA-Z]*$', '英数字だけね')
+    color = models.CharField(_('カラーコード'), max_length=6, blank=True, validators=[vcolor])
     def __str__(self):
         return self.name
     class Meta:

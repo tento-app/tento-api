@@ -36,3 +36,4 @@ https://github.com/eamigo86/graphene-django-extras
 
 https://qiita.com/okoppe8/items/10ae61808dc3056f9c8e
 
+https://github.com/flavors/django-graphql-social-auth
