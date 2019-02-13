@@ -29,4 +29,4 @@ class AdminCategory(admin.ModelAdmin):
     list_display = ['name','color','showcolor']
     search_fields = ['name','color']
     def showcolor(self, obj):
-        return mark_safe('<b style="background:{};">{}</b>'.format('#'+obj.color, '#'+obj.color))
+        return mark_safe('<b style="background:{}; color: white; padding: 5px;">{}</b>'.format('#'+obj.color, '#'+obj.color))
