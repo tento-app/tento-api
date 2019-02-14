@@ -75,6 +75,9 @@ class Team(models.Model):
         related_name="teams",
     )
 
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
     def __str__(self):
         return self.name
 

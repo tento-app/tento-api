@@ -10,7 +10,7 @@ class Query(gql.schema.Query, users.schema.Query, graphene.ObjectType):
     # as we begin to add more apps to our project
     pass
 
-class Mutation(gql.schema.Mutation, graphene.ObjectType):
+class Mutation(gql.schema.Mutation, users.schema.Mutation, graphene.ObjectType):
     auth_token = graphql_jwt.ObtainJSONWebToken.Field()
     verify_token = graphql_jwt.Verify.Field()
     refresh_token = graphql_jwt.Refresh.Field()

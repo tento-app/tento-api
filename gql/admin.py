@@ -14,14 +14,15 @@ class AdminTag(admin.ModelAdmin):
 @admin.register(Project)
 class AdminProject(admin.ModelAdmin):
     list_display = ['name','is_public']
-    search_fields = ['name','is_public']
+    search_fields = ['name','is_public','category__name','tags__name']
     fieldsets = (
         (None, {'fields': (('is_public','user','team'),'name', 'content')}),
         (_('URL info'), {'fields': ('header', 'logo','url')}),
-        (_('Model info'), {'fields': ('tags',)}),
-        (_('Important dates'), {'fields': ('created_at', 'updated_at')}),
+        (_('Model info'), {'fields': ('category','tags')}),
+        (_('Important dates'), {'fields': ('start_at', 'end_at','created_at', 'updated_at')}),
     )
-    filter_horizontal = [ 'tags']
+    readonly_fields = ('created_at', 'updated_at')
+    filter_horizontal = ['tags']
 
 # Category
 @admin.register(Category)

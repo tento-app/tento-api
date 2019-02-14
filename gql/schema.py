@@ -8,8 +8,6 @@ from graphql_jwt.decorators import login_required
 
 from gql.models import Category, Tag, Project
 
-from django.conf import settings
-
 import django_filters
 
 # Graphene will automatically map the Category model's fields onto the CategoryNode.
@@ -77,6 +75,7 @@ class ProjectInput(graphene.InputObjectType):
     header = graphene.String()
     logo = graphene.String()
     url = graphene.String()
+    tags = graphene.List(graphene.String)
     is_public = graphene.Boolean()
 
 class CreateProject(graphene.Mutation):
@@ -94,7 +93,8 @@ class CreateProject(graphene.Mutation):
             content=project_data.content,
             user=info.context.user
         )
-        # project.tags.add(Tag.objects.get(name=""))
+        # for tag in project_data.tags:
+        #     project.tags.add(Tag.objects.get(name=tag))
         return CreateProject(project=project)
 
 class Mutation(graphene.ObjectType):

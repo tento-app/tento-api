@@ -98,3 +98,32 @@ class Query(graphene.ObjectType):
     @login_required
     def resolve_host_teams(self, info, **kwargs):
         return Team.objects.filter(owner=info.context.user)
+
+
+class UserInput(graphene.InputObjectType):
+    name = graphene.String()
+    content = graphene.String()
+    header = graphene.String()
+    logo = graphene.String()
+    url = graphene.String()
+    tags = graphene.List(graphene.String)
+    is_public = graphene.Boolean()
+
+class CreateUser(graphene.Mutation):
+    class Arguments:
+        user_data =UserInput()
+        token = graphene.String(required=True)
+
+    user = graphene.Field(UserNode)
+
+    @staticmethod
+    @login_required
+    def mutate(root, info, token=None,user_data=None):
+        user = User.objects.create(
+        )
+        # for tag inUser_data.tags:
+        #    User.tags.add(Tag.objects.get(name=tag))
+        return CreateUser(project=user)
+
+class Mutation(graphene.ObjectType):
+    create_user = CreateUser.Field()

@@ -39,6 +39,7 @@ class Project(models.Model):
     header = models.URLField(_('ヘッダー'), blank=True)
     logo = models.URLField(_('logo'), blank=True)
     url =  models.URLField(_('ホームページ url'), blank=True)
+    category = models.ForeignKey('Category', related_name="projects", verbose_name=_('カテゴリー'), on_delete=models.SET_NULL, null=True)
     tags = models.ManyToManyField(
         Tag,
         verbose_name=_('tags'),
@@ -55,10 +56,13 @@ class Project(models.Model):
         default=True,
         help_text=_(
             '公開かどうか'),
-    )
+    )    
+
+    start_at = models.DateTimeField(default=timezone.now)
+    end_at = models.DateTimeField(default=timezone.now)
 
     created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
