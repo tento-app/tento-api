@@ -26,6 +26,10 @@ mutation ($username: String!, $password: String!) {
 }
 ```
 
+## Docs
+
+https://github.com/tento-app/api-graphen/tree/master/docs
+
 ## Reference
 
 https://docs.graphene-python.org/en/latest/
