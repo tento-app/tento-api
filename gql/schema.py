@@ -125,3 +125,4 @@ class UpdateProject(graphene.Mutation):
 
 class Mutation(graphene.ObjectType):
     create_project = CreateProject.Field()
+    update_project = UpdateProject.Field()

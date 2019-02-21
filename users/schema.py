@@ -102,12 +102,13 @@ class Query(graphene.ObjectType):
 
 class UserInput(graphene.InputObjectType):
     name = graphene.String()
+    password = graphene.String()
     content = graphene.String()
     header = graphene.String()
     logo = graphene.String()
     url = graphene.String()
     tags = graphene.List(graphene.String)
-    is_public = graphene.Boolean()
+    # is_public = graphene.Boolean()
 
 class CreateUser(graphene.Mutation):
     class Arguments:
@@ -120,10 +121,32 @@ class CreateUser(graphene.Mutation):
     @login_required
     def mutate(root, info, token=None,user_data=None):
         user = User.objects.create(
+            usernmae = user_data.usernmae,
+            password = user_data.password
         )
-        # for tag inUser_data.tags:
-        #    User.tags.add(Tag.objects.get(name=tag))
         return CreateUser(project=user)
+
+class ChangePassword(graphene.Mutation):
+    class Arguments:
+        new_password = graphene.String()
+        old_password = graphene.String()
+        token = graphene.String(required=True)
+
+    user = graphene.Field(UserNode)
+
+    @staticmethod
+    @login_required
+    def mutate(root, info, token=None,new_password=None, old_password=None):
+        try:
+            user = User.objects.get(uuid=info.context.user.uuid)
+            if user.check_password(old_password):
+                user.set_password(new_password)
+            user.save()
+        except User.model.DoesNotExist:
+            return None
+        return ChangePassword(user=user)
 
 class Mutation(graphene.ObjectType):
     create_user = CreateUser.Field()
+    change_password = ChangePassword.Field()
+    # update_user = UpdateUser.Field()
