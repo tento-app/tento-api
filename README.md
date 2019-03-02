@@ -1,4 +1,9 @@
 # API based on graphene for tento
+
+## Docs
+
+https://github.com/tento-app/api-graphen/tree/master/docs
+
 ## Auth
 
 ```graphql
@@ -25,10 +30,6 @@ mutation ($username: String!, $password: String!) {
   }
 }
 ```
-
-## Docs
-
-https://github.com/tento-app/api-graphen/tree/master/docs
 
 ## Reference
 

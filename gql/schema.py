@@ -49,7 +49,7 @@ class isPubricFilter(django_filters.FilterSet):
     @property
     def qs(self):
         # The query context can be found in self.request.
-        return super(isPubricFilter, self).qs.filter(is_public=True)
+        return super(isPubricFilter, self).qs.filter(is_public=True).order_by('created_at').reverse()
 
 class Query(graphene.ObjectType):
     category = relay.Node.Field(CategoryNode)
@@ -101,7 +101,7 @@ class CreateProject(graphene.Mutation):
 
 class UpdateProject(graphene.Mutation):
     class Arguments:
-        project_id  = graphene.String(required=True)
+        project_id  = graphene.String(required=True) # project_idはgraphql api上のid
         project_data = ProjectInput()
         token  = graphene.String(required=True)
 
