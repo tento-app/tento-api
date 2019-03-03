@@ -123,6 +123,21 @@ class UpdateProject(graphene.Mutation):
             return None
         return UpdateProject(project=project)
 
+# class SearchProject(graphene.Mutation):
+#     class Arguments:
+#         word = graphene.String()
+#         token = graphene.String(required=True)
+        
+#     project = graphene.Field(ProjectNode)
+
+#     @staticmethod
+#     @login_required
+#     def mutate(root, info, token=None, word=None):
+#         # Project.objects.filter(content__contains = word)
+#         project = Project.objects.filter(title__search = word,content__search = word)
+#         return SearchProject(project=project)
+
 class Mutation(graphene.ObjectType):
     create_project = CreateProject.Field()
     update_project = UpdateProject.Field()
+    # search_project = SearchProject.Field()

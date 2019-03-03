@@ -8,6 +8,9 @@ from graphql_jwt.decorators import login_required
 
 from users.models import User,Course,Team,University,Department
 
+from django.core.mail import send_mail
+
+
 class UniversityNode(DjangoObjectType):
     class Meta:
         model = University
@@ -101,8 +104,9 @@ class Query(graphene.ObjectType):
 
 
 class UserInput(graphene.InputObjectType):
-    name = graphene.String()
-    password = graphene.String()
+    name = graphene.String(required=True)
+    password = graphene.String(required=True)
+    email = graphene.String(required=True)
     content = graphene.String()
     header = graphene.String()
     logo = graphene.String()
@@ -124,6 +128,7 @@ class CreateUser(graphene.Mutation):
             usernmae = user_data.usernmae,
             password = user_data.password
         )
+        send_mail('Subject here','Here is the message.','from@example.com',['to@example.com'])
         return CreateUser(project=user)
 
 class ChangePassword(graphene.Mutation):

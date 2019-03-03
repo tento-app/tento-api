@@ -146,8 +146,9 @@ AUTHENTICATION_BACKENDS = [
 GRAPHQL_JWT = {
     'JWT_ALLOW_ARGUMENT': True,
 }
-# https://github.com/agusmakmun/django-markdown-editor
-# https://api.imgur.com/oauth2/addclient
-# Imgur API Keys
-# MARTOR_IMGUR_CLIENT_ID = '4c53c066317fec7'
-# MARTOR_IMGUR_API_KEY   = '242354a621a714420c8d8179a6ad1b9357d20678'
+
+# Email
+
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = '1025'
+# python -m smtpd -n -c DebuggingServer localhost:1025
