@@ -123,21 +123,24 @@ class UpdateProject(graphene.Mutation):
             return None
         return UpdateProject(project=project)
 
-# class SearchProject(graphene.Mutation):
-#     class Arguments:
-#         word = graphene.String()
-#         token = graphene.String(required=True)
-        
-#     project = graphene.Field(ProjectNode)
 
-#     @staticmethod
-#     @login_required
-#     def mutate(root, info, token=None, word=None):
-#         # Project.objects.filter(content__contains = word)
-#         project = Project.objects.filter(title__search = word,content__search = word)
-#         return SearchProject(project=project)
+class JoinProject(graphene.Mutation):
+    class Arguments:
+        project_id  = graphene.String(required=True) # project_idはgraphql api上のid
+        token  = graphene.String(required=True)
+
+    @staticmethod
+    @login_required
+    def mutate(root, info, token=None, project_id=None):
+        db_id = from_global_id(project_id)
+        print(db_id[1])
+        project = Project.objects.get(pk=db_id[1])
+        user = info.context.user
+        user.projects.add(project)
+        return UpdateProject(project=project)
+
 
 class Mutation(graphene.ObjectType):
     create_project = CreateProject.Field()
     update_project = UpdateProject.Field()
-    # search_project = SearchProject.Field()
+    join_project = JoinProject.Field()

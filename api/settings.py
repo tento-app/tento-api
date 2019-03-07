@@ -149,6 +149,11 @@ GRAPHQL_JWT = {
 
 # Email
 
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = '1025'
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_PORT = env('EMAIL_PORT')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = True
 # python -m smtpd -n -c DebuggingServer localhost:1025
+# from django.core.mail import send_mail, EmailMessage
+# EmailMessage("subject", "message", "xxxxxx@tento.app", ["to@gmail.com"],["bcc@gmail.com"] ).send()

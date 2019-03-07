@@ -106,6 +106,21 @@ class Course(models.Model):
         verbose_name = _('コース・学科')
         verbose_name_plural = _('コース・学科')
 
+class LikeProject(models.Model):
+
+    liked = models.BooleanField(default=True)
+    user = models.ForeignKey(User, related_name="liked", verbose_name=_('ユーザー'), on_delete=models.CASCADE, blank=True, null=True)
+    project = models.ForeignKey('gql.Project', related_name="liked", verbose_name=_('キャンプ'), on_delete=models.CASCADE, blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = _('Like')
+        verbose_name_plural = _('Like')
+
+
 class User(AbstractBaseUser, PermissionsMixin):
     """ユーザー AbstractUserをコピペし編集"""
 
@@ -153,7 +168,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     course = models.ForeignKey(
         Course,
-        verbose_name=_('コース'),
+        verbose_name=_('コース・学科'),
         blank=True,
         help_text=_('Specific course for this user.'),
         related_name="users",
@@ -174,6 +189,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text=_('Specific Project for this user.'),
         related_name="users",
     )
+    # 時系列順にするため別クラス作成
+    # likes = models.ManyToManyField('gql.Project',verbose_name=_('likes'),blank=True,help_text=_('likes Project for this user.'),related_name="liked",)
 
     content = models.TextField(_('User content'), blank=True)
     header = models.URLField(_('header'), blank=True)
