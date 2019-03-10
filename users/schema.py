@@ -151,6 +151,24 @@ class ChangePassword(graphene.Mutation):
             return None
         return ChangePassword(user=user)
 
+from graphene_file_upload.scalars import Upload
+
+class UploadTestimg(graphene.Mutation):
+    class Arguments:
+        file = Upload(required=True)
+        token = graphene.String(required=True)
+
+    success = graphene.Boolean()
+
+    @staticmethod
+    @login_required
+    def mutate(self, info, file, **kwargs):
+        user = User.objects.get(uuid=info.context.user.uuid)
+        files = info.context.FILES
+        user.testimg = files
+        user.save()
+        return UploadTestimg(success=True)
+
 class Mutation(graphene.ObjectType):
     create_user = CreateUser.Field()
     change_password = ChangePassword.Field()

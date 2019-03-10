@@ -109,7 +109,7 @@ class Course(models.Model):
 class LikeProject(models.Model):
 
     liked = models.BooleanField(default=True)
-    user = models.ForeignKey(User, related_name="liked", verbose_name=_('ユーザー'), on_delete=models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey('User', related_name="liked", verbose_name=_('ユーザー'), on_delete=models.CASCADE, blank=True, null=True)
     project = models.ForeignKey('gql.Project', related_name="liked", verbose_name=_('キャンプ'), on_delete=models.CASCADE, blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -196,6 +196,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     header = models.URLField(_('header'), blank=True)
     logo = models.URLField(_('logo'), blank=True)
     url =  models.URLField(_('url'), blank=True)
+    testimg = models.ImageField(upload_to='images/', blank=True)
 
     is_staff = models.BooleanField(
         _('staff status'),

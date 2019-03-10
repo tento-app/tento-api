@@ -51,7 +51,7 @@ class AdminUserAdminForm(forms.ModelForm):
 class AdminUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        (_('URL info'), {'fields': ('header', 'logo','url')}),
+        (_('URL info'), {'fields': ('header', 'logo','url','testimg')}),
         (_('Personal info'), {'fields': ('name', 'email','university','department','course','teams','projects','tags')}),
         (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
                                        'groups', 'user_permissions')}),

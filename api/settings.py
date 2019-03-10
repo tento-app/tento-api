@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'users',
     'gql',
     'graphene_django',
+    'django_cleanup',
 ]
 
 MIDDLEWARE = [
@@ -81,7 +82,17 @@ env = environ.Env()
 base = environ.Path(__file__) - 2 # two folders back (/a/b/ - 2 = /)
 environ.Env.read_env(env_file=base('.env')) # reading .env file
 DATABASES = {
-    'default': env.db()
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASS'),
+        'HOST': env('DB_HOST'),
+        'PORT': env('DB_PORT'),
+        'OPTIONS': {
+           'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+       },
+    }
     # 'default': {
     #     'ENGINE': 'django.db.backends.sqlite3',
     #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
@@ -157,3 +168,13 @@ EMAIL_USE_TLS = True
 # python -m smtpd -n -c DebuggingServer localhost:1025
 # from django.core.mail import send_mail, EmailMessage
 # EmailMessage("subject", "message", "xxxxxx@tento.app", ["to@gmail.com"],["bcc@gmail.com"] ).send()
+
+DEFAULT_FILE_STORAGE = env('DEFAULT_FILE_STORAGE')
+SWIFT_AUTH_URL = env('SWIFT_AUTH_URL')
+SWIFT_USERNAME = env('SWIFT_USERNAME')
+SWIFT_PASSWORD = env('SWIFT_PASSWORD')
+SWIFT_TENANT_NAME = env('SWIFT_TENANT_NAME')
+SWIFT_TENANT_ID = env('SWIFT_TENANT_ID')
+SWIFT_CONTAINER_NAME = env('SWIFT_CONTAINER_NAME')
+SWIFT_AUTO_CREATE_CONTAINER = True
+SWIFT_AUTO_CREATE_CONTAINER_PUBLIC = True

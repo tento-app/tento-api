@@ -128,6 +128,7 @@ class JoinProject(graphene.Mutation):
     class Arguments:
         project_id  = graphene.String(required=True) # project_idはgraphql api上のid
         token  = graphene.String(required=True)
+    project = graphene.Field(ProjectNode)
 
     @staticmethod
     @login_required
