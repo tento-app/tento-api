@@ -9,3 +9,4 @@ graphene-file-upload==1.2.2
 django-environ==0.4.5
 PyMySQL==0.9.3
 Pillow==5.4.1
+gunicorn==19.9.0
