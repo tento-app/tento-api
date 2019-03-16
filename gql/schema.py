@@ -111,7 +111,6 @@ class UpdateProject(graphene.Mutation):
     @login_required
     def mutate(root, info, token=None, project_data=None, project_id=None):
         db_id = from_global_id(project_id)
-        print(db_id[1])
         try:
             project = Project.objects.get(pk=db_id[1])
             project.name = project_data.name
@@ -134,7 +133,6 @@ class JoinProject(graphene.Mutation):
     @login_required
     def mutate(root, info, token=None, project_id=None):
         db_id = from_global_id(project_id)
-        print(db_id[1])
         project = Project.objects.get(pk=db_id[1])
         user = info.context.user
         user.projects.add(project)

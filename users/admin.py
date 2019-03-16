@@ -41,7 +41,6 @@ class AdminUserAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(AdminUserAdminForm, self).__init__(*args, **kwargs)
-        print(self.instance.university)
         if self.instance.university:
             self.fields['department'].queryset = Department.objects.filter(university=self.instance.university)
         if self.instance.department:
