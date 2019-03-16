@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'gql',
     'graphene_django',
     'django_cleanup',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -50,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'api.urls'
@@ -157,6 +159,11 @@ AUTHENTICATION_BACKENDS = [
 GRAPHQL_JWT = {
     'JWT_ALLOW_ARGUMENT': True,
 }
+
+CORS_ORIGIN_WHITELIST = (
+    'localhost:3000',
+    '127.0.0.1:3000'
+)
 
 # Email
 
