@@ -20,10 +20,10 @@ jobs:
           fingerprints:
             - "1a:87:f5:b4:33:1d:65:a9:0f:06:f1:88:28:78:69:69"
  
-      - run:
-          name: Start ssh-keyscan
-          command: |
-            ssh-keyscan -p ${PORT_NUM} ${HOST_NAME} >> ~/.ssh/known_hosts
+      # - run:
+      #     name: Start ssh-keyscan
+      #     command: |
+      #       ssh-keyscan -p ${PORT_NUM} ${HOST_NAME} >> ~/.ssh/known_hosts
  
       - run:
           name: Start master deploy
