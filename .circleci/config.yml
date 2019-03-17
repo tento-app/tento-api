@@ -12,11 +12,6 @@ jobs:
   deploy:
     docker:
       - image: sickp/alpine-sshd
-
-     branches:
-      only:
-        - master
-        - develop
  
     steps:
       - checkout
@@ -40,6 +35,6 @@ workflows:
     deploys:
       jobs:
         - deploy:
-          filters:
-            branches:
-              only: master
+            filters:
+              branches:
+                only: master
