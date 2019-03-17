@@ -27,7 +27,7 @@ jobs:
  
       - run:
           name: Start master deploy
-          command: ssh -o StrictHostKeyChecking=no ${USER_NAME}@${HOST_NAME} -p ${PORT_NUM} | cd ${APP_DIR}
+          command: ssh -o StrictHostKeyChecking=no ${USER_NAME}@${HOST_NAME} -p ${PORT_NUM} `cd /var/www/api-graphen/`
       
       - run:
           name: sh
