@@ -27,11 +27,11 @@ jobs:
  
       - run:
           name: Start master deploy
-          command: ssh -o StrictHostKeyChecking=no ${USER_NAME}@${HOST_NAME} -p ${PORT_NUM}
+          command: ssh -o StrictHostKeyChecking=no ${USER_NAME}@${HOST_NAME} -p ${PORT_NUM} | cd ${APP_DIR}
       
       - run:
           name: sh
-          command: cd ${APP_DIR} & echo ${USER_PASS} | sudo -S git pull & echo ${USER_PASS} | sudo -S kill -QUIT `cat ${UWSGI_PID}` & echo ${USER_PASS} | sudo -S uwsgi --ini api/api_uwsgi.ini --daemonize ${UWSGI_LOG} --pidfile ${UWSGI_PID}
+          command: echo ${USER_PASS} | sudo -S git pull & echo ${USER_PASS} | sudo -S kill -QUIT `cat ${UWSGI_PID}` & echo ${USER_PASS} | sudo -S uwsgi --ini api/api_uwsgi.ini --daemonize ${UWSGI_LOG} --pidfile ${UWSGI_PID}
 
 workflows:
   version: 2
