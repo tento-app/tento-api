@@ -1,0 +1,45 @@
+# Environment variables
+# - HOST_NAME
+# - USER_NAME
+# - PORT_NUM
+# - USER_PASS
+# - APP_DIR
+# - UWSGI_LOG
+# - UWSGI_PID
+ 
+version: 2
+jobs:
+  deploy:
+    docker:
+      - image: sickp/alpine-sshd
+
+     branches:
+      only:
+        - master
+        - develop
+ 
+    steps:
+      - checkout
+ 
+      - add_ssh_keys:
+          fingerprints:
+            - "1a:87:f5:b4:33:1d:65:a9:0f:06:f1:88:28:78:69:69"
+ 
+      - run:
+          name: Start ssh-keyscan
+          command: |
+            ssh-keyscan -p ${PORT_NUM} ${HOST_NAME} >> ~/.ssh/known_hosts
+ 
+      - deploy:
+          name: Start master deploy
+          command: ssh ${USER_NAME}@${HOST_NAME} -p ${PORT_NUM} & cd ${APP_DIR} & echo ${USER_PASS} | sudo -S git pull & echo ${USER_PASS} | sudo -S kill -QUIT `cat ${UWSGI_PID}` & echo ${USER_PASS} | sudo -S uwsgi --ini api/api_uwsgi.ini --daemonize ${UWSGI_LOG} --pidfile ${UWSGI_PID}
+
+
+workflows:
+  version: 2
+    deploys:
+      jobs:
+        - deploy:
+          filters:
+            branches:
+              only: master
