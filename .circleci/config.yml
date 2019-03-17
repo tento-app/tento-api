@@ -32,7 +32,7 @@ jobs:
 
 workflows:
   version: 2
-    deploys:
+    deploy_to_server:
       jobs:
         - deploy:
             filters:
