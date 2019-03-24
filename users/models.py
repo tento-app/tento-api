@@ -193,10 +193,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     # likes = models.ManyToManyField('gql.Project',verbose_name=_('likes'),blank=True,help_text=_('likes Project for this user.'),related_name="liked",)
 
     content = models.TextField(_('User content'), blank=True)
-    header = models.URLField(_('header'), blank=True)
-    logo = models.URLField(_('logo'), blank=True)
+    header = models.ImageField(_('header'),upload_to='header/', blank=True)
     url =  models.URLField(_('url'), blank=True)
-    testimg = models.ImageField(upload_to='images/', blank=True)
+    logo = models.ImageField(_('logo'),upload_to='logo/', blank=True)
+    testimg = models.ImageField(_('testimg'),upload_to='testimgs/', blank=True)
+
 
     is_staff = models.BooleanField(
         _('staff status'),

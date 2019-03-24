@@ -11,6 +11,7 @@ from gql.models import Category, Tag, Project
 
 import django_filters
 
+from graphene_file_upload.scalars import Upload
 # Graphene will automatically map the Category model's fields onto the CategoryNode.
 # This is configured in the CategoryNode's Meta class (as you can see below)
 
@@ -73,10 +74,9 @@ class Query(graphene.ObjectType):
 class ProjectInput(graphene.InputObjectType):
     name = graphene.String()
     content = graphene.String()
-    header = graphene.String()
-    logo = graphene.String()
-    url = graphene.String()
+    header = graphene.Upload()
     tags = graphene.List(graphene.String)
+    date = graphene.String()
     is_public = graphene.Boolean()
 
 class CreateProject(graphene.Mutation):

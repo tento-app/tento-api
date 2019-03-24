@@ -16,7 +16,7 @@ class AdminProject(admin.ModelAdmin):
     list_display = ['name','is_public']
     search_fields = ['name','is_public','category__name','tags__name']
     fieldsets = (
-        (None, {'fields': (('is_public','user','team'),'name', 'content')}),
+        (None, {'fields': (('is_public','user','team'),'name', 'place', 'contact', 'content')}),
         (_('URL info'), {'fields': ('header', 'logo','url')}),
         (_('Model info'), {'fields': ('category','tags')}),
         (_('Important dates'), {'fields': ('start_at', 'end_at','created_at', 'updated_at')}),
