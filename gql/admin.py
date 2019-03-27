@@ -13,21 +13,20 @@ class AdminTag(admin.ModelAdmin):
 # キャンプ
 @admin.register(Project)
 class AdminProject(admin.ModelAdmin):
-    list_display = ['name','is_public']
+    list_display = ['name','is_public','is_open']
     search_fields = ['name','is_public','category__name','tags__name']
     fieldsets = (
-        (None, {'fields': (('is_public','user','team'),'name', 'place', 'contact', 'content')}),
-        (_('URL info'), {'fields': ('header', 'logo','url')}),
-        (_('Model info'), {'fields': ('category','tags')}),
-        (_('Important dates'), {'fields': ('start_at', 'end_at','created_at', 'updated_at')}),
+        (None, {'fields': (('is_public','is_open','user','team'),'name', 'header', 'place', 'contact', 'content')}),
+        (_('Model info'), {'fields': ('start_at', 'tags')}),
+        (_('Important dates'), {'fields': ('created_at', 'updated_at')}),
     )
     readonly_fields = ('created_at', 'updated_at')
     filter_horizontal = ['tags']
 
 # Category
-@admin.register(Category)
-class AdminCategory(admin.ModelAdmin):
-    list_display = ['name','color','showcolor']
-    search_fields = ['name','color']
-    def showcolor(self, obj):
-        return mark_safe('<b style="background:{}; color: white; padding: 5px;">{}</b>'.format('#'+obj.color, '#'+obj.color))
+# @admin.register(Category)
+# class AdminCategory(admin.ModelAdmin):
+#     list_display = ['name','color','showcolor']
+#     search_fields = ['name','color']
+#     def showcolor(self, obj):
+#         return mark_safe('<b style="background:{}; color: white; padding: 5px;">{}</b>'.format('#'+obj.color, '#'+obj.color))
