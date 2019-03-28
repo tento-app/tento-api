@@ -8,7 +8,7 @@ from django.utils import timezone
 # Create your models here.
 
 class Tag(models.Model):
-    alphanumeric = RegexValidator(r'^[0-9a-zA-Z+]*$', '大小英数字+だけね')
+    alphanumeric = RegexValidator(r'^[0-9a-zA-Zぁ-んァ-ヶー一-龠]*$', '大小英数字+だけね')
     name = models.CharField(_('タグ'), max_length=150, blank=True, validators=[alphanumeric])
     logo = models.ImageField(_('logo'),upload_to='tag/', blank=True)
     # vcolor = RegexValidator(r'^[0-9a-zA-Z]*$', '英数字だけね')
@@ -36,7 +36,6 @@ class Project(models.Model):
     # キャンプ
     name = models.CharField(_('タイトル'), max_length=100, blank=True, null=True)
     content = models.TextField(_('内容'), blank=True, null=True)
-    # header = models.URLField(_('ヘッダー'), blank=True)
     header = models.ImageField(_('ヘッダー'),upload_to='header/', blank=True, null=True)
     place = models.CharField(_('開催場所'), max_length=100, blank=True, null=True)
     contact = models.CharField(_('連絡先'), max_length=100, blank=True, null=True)

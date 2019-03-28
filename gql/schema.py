@@ -13,7 +13,7 @@ from gql.models import Category, Tag, Project
 import django_filters
 
 from graphene_file_upload.scalars import Upload
-
+import dateutil.parser
 
 # Graphene will automatically map the Category model's fields onto the CategoryNode.
 # This is configured in the CategoryNode's Meta class (as you can see below)
@@ -37,7 +37,7 @@ class ProjectNode(DjangoObjectType):
             'name': ['exact', 'icontains', 'istartswith'],
             'place': ['exact', 'icontains', 'istartswith'],
             'users': ['exact'],
-            'start_at' : ['exact', 'year__gt'],
+            'start_at' : ['exact'],
             'created_at' : ['exact', 'year__gt'],
             'updated_at' : ['exact', 'year__gt'],
             'is_public': ['exact'],
@@ -51,7 +51,12 @@ class isPubricFilter(django_filters.FilterSet):
         model = Project
         fields = {
         'name': ['exact', 'icontains', 'istartswith'],
+        'place': ['exact', 'icontains', 'istartswith'],
         'users': ['exact'],
+        'start_at' : ['exact'],
+        'created_at' : ['exact', 'year__gt'],
+        'updated_at' : ['exact', 'year__gt'],
+        'is_public': ['exact'],
         'tags': ['exact'],
         'tags__name': ['exact', 'icontains', 'istartswith'],
         }
@@ -84,10 +89,10 @@ class ProjectInput(graphene.InputObjectType):
     content = graphene.String()
     contact = graphene.String()
     place = graphene.String()
+    startat = graphene.String()
     header = Upload()
     tags = graphene.List(graphene.String)
-    start_at = graphene.DateTime()
-    is_public = graphene.Boolean()
+    isPublic = graphene.Boolean()
 
 class CreateProject(graphene.Mutation):
     class Arguments:
@@ -99,17 +104,22 @@ class CreateProject(graphene.Mutation):
     @staticmethod
     @login_required
     def mutate(root, info, token=None, project_data=None):
-        print(project_data.start_at)
         project = Project.objects.create(
             user=info.context.user,
-            name = project_data.name,
-            content = project_data.content,
-            contact = project_data.contact,
-            place = project_data.place,
-            start_at = project_data.start_at,
-            header = project_data.header
+            name=project_data.name,
+            content=project_data.content,
+            contact=project_data.contact,
+            place=project_data.place,
+            start_at=dateutil.parser.parse(project_data.startat),
+            header=project_data.header
             )
-        project.save()
+        # if project_data.name: project.name = project_data.name
+        # if project_data.content: project.content = project_data.content
+        # if project_data.contact: project.contact = project_data.contact
+        # if project_data.place: project.place = project_data.place
+        # if project_data.header: project.header = project_data.header
+        # if project_data.start_at: project.start_at = project_data.start_at
+        # project.save()
         if project_data.tags:
             for tag in project_data.tags:
                 print(tag)
