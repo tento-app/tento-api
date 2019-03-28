@@ -80,14 +80,14 @@ class Query(graphene.ObjectType):
 
 
 class ProjectInput(graphene.InputObjectType):
-    name = graphene.String(default=None)
-    content = graphene.String(default=None)
-    contact = graphene.String(default=None)
-    place = graphene.String(default=None)
-    header = Upload(default=None)
+    name = graphene.String()
+    content = graphene.String()
+    contact = graphene.String()
+    place = graphene.String()
+    header = Upload()
     tags = graphene.List(graphene.String)
-    start_at = graphene.String(default=timezone.now)
-    is_public = graphene.Boolean(default=True)
+    start_at = graphene.DateTime()
+    is_public = graphene.Boolean()
 
 class CreateProject(graphene.Mutation):
     class Arguments:
@@ -99,26 +99,27 @@ class CreateProject(graphene.Mutation):
     @staticmethod
     @login_required
     def mutate(root, info, token=None, project_data=None):
-        print(project_data)
+        print(project_data.start_at)
         project = Project.objects.create(
-            name=project_data.name,
-            content=project_data.content,
-            contact=project_data.contact,
-            place=project_data.place,
-            start_at=project_data.start_at,
-            header=project_data.header,
-            user=info.context.user
-        )
+            user=info.context.user,
+            name = project_data.name,
+            content = project_data.content,
+            contact = project_data.contact,
+            place = project_data.place,
+            start_at = project_data.start_at,
+            header = project_data.header
+            )
+        project.save()
         if project_data.tags:
             for tag in project_data.tags:
                 print(tag)
-                if Tag.objects.get(name=tag).exists():
+                if Tag.objects.get(name=tag):
                     project.tags.add(Tag.objects.get(name=tag))
         return CreateProject(project=project)
 
 class UpdateProject(graphene.Mutation):
     class Arguments:
-        project_id  = graphene.String(required=True) # project_idはgraphql api上のid
+        project_id  = graphene.String(required=True) # project_idはgraphql relay上のid
         project_data = ProjectInput()
         token  = graphene.String(required=True)
 

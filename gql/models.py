@@ -64,17 +64,17 @@ class Project(models.Model):
             '公開かどうか'),
     )    
 
-    start_at = models.DateTimeField(default=timezone.now)
+    start_at = models.DateTimeField(default=timezone.now, blank=True)
 
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(default=timezone.now, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, blank=True)
 
     # 使ってない
-    end_at = models.DateTimeField(default=timezone.now)
+    end_at = models.DateTimeField(default=timezone.now, blank=True)
     team = models.ForeignKey('users.Team', related_name="host_projects", verbose_name=_('代表サークル'), on_delete=models.CASCADE, blank=True, null=True)
     url =  models.URLField(_('ホームページ url'), blank=True)
     logo = models.URLField(_('logo'), blank=True)
-    category = models.ForeignKey('Category', related_name="projects", verbose_name=_('カテゴリー'), on_delete=models.SET_NULL, null=True)
+    category = models.ForeignKey('Category', related_name="projects", verbose_name=_('カテゴリー'), on_delete=models.SET_NULL, null=True, blank=True)
     def __str__(self):
         return self.name
 
