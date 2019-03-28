@@ -52,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    # 'request_logging.middleware.LoggingMiddleware',
 ]
 
 ROOT_URLCONF = 'api.urls'
@@ -186,3 +187,20 @@ SWIFT_TENANT_ID = env('SWIFT_TENANT_ID')
 SWIFT_CONTAINER_NAME = env('SWIFT_CONTAINER_NAME')
 SWIFT_AUTO_CREATE_CONTAINER = True
 SWIFT_AUTO_CREATE_CONTAINER_PUBLIC = True
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'DEBUG',  # change debug level as appropiate
+            'propagate': False,
+        },
+    },
+}

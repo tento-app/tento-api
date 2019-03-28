@@ -4,12 +4,16 @@ from graphene import relay, ObjectType
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from graphql_relay.node.node import from_global_id
+from django.utils import timezone
 
 from graphql_jwt.decorators import login_required
 
 from gql.models import Category, Tag, Project
 
 import django_filters
+
+from graphene_file_upload.scalars import Upload
+
 
 # Graphene will automatically map the Category model's fields onto the CategoryNode.
 # This is configured in the CategoryNode's Meta class (as you can see below)
@@ -31,7 +35,12 @@ class ProjectNode(DjangoObjectType):
         model = Project
         filter_fields = {
             'name': ['exact', 'icontains', 'istartswith'],
+            'place': ['exact', 'icontains', 'istartswith'],
             'users': ['exact'],
+            'start_at' : ['exact', 'year__gt'],
+            'created_at' : ['exact', 'year__gt'],
+            'updated_at' : ['exact', 'year__gt'],
+            'is_public': ['exact'],
             'tags': ['exact'],
             'tags__name': ['exact', 'icontains', 'istartswith'],
         }
@@ -73,10 +82,11 @@ class Query(graphene.ObjectType):
 class ProjectInput(graphene.InputObjectType):
     name = graphene.String()
     content = graphene.String()
-    header = graphene.String()
-    logo = graphene.String()
-    url = graphene.String()
+    contact = graphene.String()
+    place = graphene.String()
+    header = Upload()
     tags = graphene.List(graphene.String)
+    start_at = graphene.DateTime()
     is_public = graphene.Boolean()
 
 class CreateProject(graphene.Mutation):
@@ -89,19 +99,27 @@ class CreateProject(graphene.Mutation):
     @staticmethod
     @login_required
     def mutate(root, info, token=None, project_data=None):
+        print(project_data.start_at)
         project = Project.objects.create(
-            name=project_data.name,
-            content=project_data.content,
-            user=info.context.user
-        )
+            user=info.context.user,
+            name = project_data.name,
+            content = project_data.content,
+            contact = project_data.contact,
+            place = project_data.place,
+            start_at = project_data.start_at,
+            header = project_data.header
+            )
+        project.save()
         if project_data.tags:
             for tag in project_data.tags:
-                project.tags.add(Tag.objects.get(name=tag))
+                print(tag)
+                if Tag.objects.get(name=tag):
+                    project.tags.add(Tag.objects.get(name=tag))
         return CreateProject(project=project)
 
 class UpdateProject(graphene.Mutation):
     class Arguments:
-        project_id  = graphene.String(required=True) # project_idはgraphql api上のid
+        project_id  = graphene.String(required=True) # project_idはgraphql relay上のid
         project_data = ProjectInput()
         token  = graphene.String(required=True)
 
@@ -113,7 +131,12 @@ class UpdateProject(graphene.Mutation):
         db_id = from_global_id(project_id)
         try:
             project = Project.objects.get(pk=db_id[1])
-            project.name = project_data.name
+            if project_data.name: project.name = project_data.name
+            if project_data.content: project.content = project_data.content
+            if project_data.contact: project.contact = project_data.contact
+            if project_data.place: project.place = project_data.place
+            if project_data.start_at: project.start_at = project_data.start_at
+            if project_data.header: project.header = project_data.header
             project.save()
             if project_data.tags:
                 for tag in project_data.tags:
@@ -137,7 +160,6 @@ class JoinProject(graphene.Mutation):
         user = info.context.user
         user.projects.add(project)
         return UpdateProject(project=project)
-
 
 class Mutation(graphene.ObjectType):
     create_project = CreateProject.Field()
