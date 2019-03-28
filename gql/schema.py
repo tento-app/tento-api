@@ -122,7 +122,6 @@ class CreateProject(graphene.Mutation):
         # project.save()
         if project_data.tags:
             for tag in project_data.tags:
-                print(tag)
                 if Tag.objects.get(name=tag):
                     project.tags.add(Tag.objects.get(name=tag))
         return CreateProject(project=project)
