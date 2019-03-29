@@ -6,9 +6,11 @@ from graphene_django.filter import DjangoFilterConnectionField
 
 from graphql_jwt.decorators import login_required
 
-from users.models import User,Course,Team,University,Department
+from users.models import User,Course,Team,University,Department,Like
 
 from django.core.mail import send_mail
+from graphql_relay.node.node import from_global_id
+from graphene_file_upload.scalars import Upload
 
 
 class UniversityNode(DjangoObjectType):
@@ -70,6 +72,16 @@ class UserNode(DjangoObjectType):
         }
         interfaces = (relay.Node, )
 
+class LikeNode(DjangoObjectType):
+    class Meta:
+        model = Like
+        filter_fields = {
+            'user': ['exact'],
+            'project': ['exact'],
+            'created_at': ['exact'],
+        }
+        interfaces = (relay.Node, )
+
 
 class Query(graphene.ObjectType):
     viewer = graphene.Field(UserNode, token=graphene.String(required=True))
@@ -80,6 +92,9 @@ class Query(graphene.ObjectType):
 
     user = relay.Node.Field(UserNode)
     all_users = DjangoFilterConnectionField(UserNode)
+
+    like = relay.Node.Field(LikeNode)
+    all_likes = DjangoFilterConnectionField(LikeNode)
 
     university = relay.Node.Field(UniversityNode)
     all_university = DjangoFilterConnectionField(UniversityNode)
@@ -110,6 +125,7 @@ class UserInput(graphene.InputObjectType):
     header = graphene.String()
     logo = graphene.String()
     url = graphene.String()
+    position = graphene.String()
     tags = graphene.List(graphene.String)
     # is_public = graphene.Boolean()
 
@@ -124,11 +140,54 @@ class CreateUser(graphene.Mutation):
     @login_required
     def mutate(root, info, token=None,user_data=None):
         user = User.objects.create(
+            email = user_data.email,
             usernmae = user_data.usernmae,
-            password = user_data.password
+            password = user_data.password,
+            content = user_data.content,
+            header = user_data.header,
+            logo = user_data.logo,
+            url = user_data.url,
+            position = user_data.position,
         )
+        if user_data.tags:
+            for tag in user_data.tags:
+                user.tags.add(Tag.objects.get(name=tag))
         send_mail('Subject here','Here is the message.','from@example.com',['to@example.com'])
-        return CreateUser(project=user)
+        return CreateUser(user=user)
+
+class UpdateUserInput(graphene.InputObjectType):
+    name = graphene.String()
+    email = graphene.String()
+    content = graphene.String()
+    header = graphene.String()
+    logo = graphene.String()
+    url = graphene.String()
+    position = graphene.String()
+    tags = graphene.List(graphene.String)
+
+class UpdateUser(graphene.Mutation):
+    class Arguments:
+        user_data = UpdateUserInput()
+        token = graphene.String(required=True)
+
+    user = graphene.Field(UserNode)
+
+    @staticmethod
+    @login_required
+    def mutate(root, info, token=None,user_data=None):
+        user = info.context.user
+        if user_data.name:  user.name = user_data.name
+        if user_data.email:  user.email = user_data.email
+        if user_data.content:  user.content = user_data.content
+        if user_data.header:  user.header = user_data.header
+        if user_data.logo:  user.logo = user_data.logo
+        if user_data.url:  user.url = user_data.url
+        if user_data.position:  user.position = user_data.position
+        user.save()
+        if user_data.tags:
+            for tag in user_data.tags:
+                user.tags.add(Tag.objects.get(name=tag))
+        return UpdateUser(user=user)
 
 class ChangePassword(graphene.Mutation):
     class Arguments:
@@ -136,39 +195,49 @@ class ChangePassword(graphene.Mutation):
         old_password = graphene.String()
         token = graphene.String(required=True)
 
-    user = graphene.Field(UserNode)
+    success = graphene.Boolean()
 
     @staticmethod
     @login_required
     def mutate(root, info, token=None,new_password=None, old_password=None):
         try:
-            user = User.objects.get(uuid=info.context.user.uuid)
+            user = info.context.user
             if user.check_password(old_password):
                 user.set_password(new_password)
-            user.save()
-        except User.model.DoesNotExist:
-            return None
-        return ChangePassword(user=user)
+                user.save()
+                success = True
+            else:
+                success = False
+        except:
+            success = False
+        return ChangePassword(success=success)
 
-from graphene_file_upload.scalars import Upload
-
-class UploadTestimg(graphene.Mutation):
+class Liked(graphene.Mutation):
     class Arguments:
-        file = Upload(required=True)
+        like_id = graphene.String()
+        project_id = graphene.String()
         token = graphene.String(required=True)
 
     success = graphene.Boolean()
 
     @staticmethod
     @login_required
-    def mutate(self, info, file, **kwargs):
-        user = User.objects.get(uuid=info.context.user.uuid)
-        files = info.context.FILES
-        user.testimg = files
-        user.save()
-        return UploadTestimg(success=True)
+    def mutate(self, info, project_id=None, is_liked=None, like_id=None):
+        if like_id:
+            db_id = from_global_id(like_id)
+            like = Like.objects.get(pk=db_id[1])
+            like.delete()
+        else:
+            db_id = from_global_id(project_id)
+            project = Project.objects.get(pk=db_id[1])
+            Like.objects.create(
+                user=info.context.user,
+                project=project
+            )
+        return Liked(success=True)
 
 class Mutation(graphene.ObjectType):
     create_user = CreateUser.Field()
+    update_user = UpdateUser.Field()
     change_password = ChangePassword.Field()
-    # update_user = UpdateUser.Field()
+    liked = Liked.Field()

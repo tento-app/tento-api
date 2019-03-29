@@ -107,15 +107,13 @@ class Course(models.Model):
         verbose_name = _('コース・学科')
         verbose_name_plural = _('コース・学科')
 
-class LikeProject(models.Model):
-
-    liked = models.BooleanField(default=True)
+class Like(models.Model):
     user = models.ForeignKey('User', related_name="liked", verbose_name=_('ユーザー'), on_delete=models.CASCADE, blank=True, null=True)
     project = models.ForeignKey('gql.Project', related_name="liked", verbose_name=_('キャンプ'), on_delete=models.CASCADE, blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return self.name
+        return '{} liked {}'.format(self.user.username,self.project.name)
 
     class Meta:
         verbose_name = _('Like')
