@@ -49,14 +49,14 @@ class AdminUserAdminForm(forms.ModelForm):
 @admin.register(User)
 class AdminUserAdmin(UserAdmin):
     fieldsets = (
-        (None, {'fields': ('username', 'password')}),
+        (None, {'fields': ('email', 'password')}),
         (_('URL info'), {'fields': ('header', 'logo','url')}),
-        (_('Personal info'), {'fields': ('name', 'email','university','department','course','teams','projects','tags')}),
+        (_('Personal info'), {'fields': ('username', 'position','content','university','department','course','teams','projects','tags')}),
         (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
                                        'groups', 'user_permissions')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
-    list_display = ('username', 'email','course', 'name', 'is_staff')
-    search_fields = ('username', 'name', 'email','course__name','university__name','department__name')
+    list_display = ('username', 'email','course', 'position', 'is_staff')
+    search_fields = ('username', 'position', 'email','course__name','university__name','department__name')
     filter_horizontal = ('groups', 'user_permissions','teams','projects','tags')
     form = AdminUserAdminForm

@@ -89,7 +89,7 @@ class ProjectInput(graphene.InputObjectType):
     content = graphene.String()
     contact = graphene.String()
     place = graphene.String()
-    startat = graphene.String()
+    start_at = graphene.String()
     header = Upload()
     tags = graphene.List(graphene.String)
     isPublic = graphene.Boolean()
@@ -110,7 +110,7 @@ class CreateProject(graphene.Mutation):
             content=project_data.content,
             contact=project_data.contact,
             place=project_data.place,
-            start_at=dateutil.parser.parse(project_data.startat),
+            start_at=dateutil.parser.parse(project_data.start_at),
             header=project_data.header
             )
         # if project_data.name: project.name = project_data.name
