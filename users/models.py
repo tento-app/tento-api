@@ -8,6 +8,7 @@ import uuid as uuid_lib
 
 from gql.models import Tag,Project
 
+
 # Create your models here.
 
 class University(models.Model):
@@ -139,8 +140,8 @@ class User(AbstractBaseUser, PermissionsMixin):
             'unique': _("A user with that username already exists."),
         },
     )
-    name = models.CharField(_('Display Name'), max_length=150, blank=True)
-    email = models.EmailField(_('email address'), blank=True)
+    position = models.CharField(_('position'), max_length=150, blank=True)
+    email = models.EmailField(_('email address'), unique=True)
     university = models.ForeignKey(
         University,
         verbose_name=_('大学'),
@@ -196,7 +197,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     header = models.ImageField(_('header'),upload_to='header/', blank=True)
     url =  models.URLField(_('url'), blank=True)
     logo = models.ImageField(_('logo'),upload_to='logo/', blank=True)
-    testimg = models.ImageField(_('testimg'),upload_to='testimgs/', blank=True)
 
 
     is_staff = models.BooleanField(
@@ -219,7 +219,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email', ]
+    REQUIRED_FIELDS = []
 
     class Meta:
         verbose_name = _('ユーザー')
@@ -235,7 +235,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     # 既存メソッドの変更
     def get_name(self):
-        return self.name
+        return self.username
 
     def get_short_name(self):
-        return self.name
+        return self.username

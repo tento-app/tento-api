@@ -58,7 +58,6 @@ class UserNode(DjangoObjectType):
         # filter_fields = ['username', 'email','course','teams']
         filter_fields = {
             'username': ['exact', 'icontains', 'istartswith'],
-            'name': ['exact', 'icontains', 'istartswith'],
             'email': ['exact', 'icontains'],
             'course': ['exact'],
             'course__name': ['exact'],
