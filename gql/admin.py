@@ -3,12 +3,19 @@ from django.utils.translation import gettext, gettext_lazy as _
 from django.utils.safestring import mark_safe
 # Register your models here.
 from .models import Tag, Category, Project
-
+import urllib
 # タグ
 @admin.register(Tag)
 class AdminTag(admin.ModelAdmin):
-    list_display = ['name']
+    list_display = ['name','img']
     search_fields = ['name']
+    def img(self, obj):
+        if obj.logo:
+            return mark_safe('<img src="https://media.tento.app/{}" width="50" height="50" />'.format(urllib.parse.quote(obj.logo.name)))
+        else:
+            return mark_safe('<p>画像がありません</p>')
+    img.short_description = 'Image'
+    img.allow_tags = True
 
 # キャンプ
 @admin.register(Project)
