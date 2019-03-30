@@ -94,7 +94,7 @@ class Query(graphene.ObjectType):
     all_users = DjangoFilterConnectionField(UserNode)
 
     like = relay.Node.Field(LikeNode)
-    all_likes = DjangoFilterConnectionField(LikeNode)
+    all_likes = DjangoFilterConnectionField(LikeNode, token=graphene.String(required=True))
     @login_required
     def resolve_all_likes(self, info, **kwargs):
         return Like.objects.filter(user=info.context.user).order_by('-created_at')
