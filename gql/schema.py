@@ -150,16 +150,17 @@ class UpdateProject(graphene.Mutation):
                 project.header = project_data.header
                 project.thumbnail = project_data.header
             project.save()
-            now_tags = project.tags.values_list('name', flat=True)
-            new_tags = project_data.tags
-            add_tags = list(set(new_tags)-set(now_tags))
-            if add_tags:
-                for tag in add_tags:
-                    project.tags.add(Tag.objects.get(name=tag))
-            remove_tags = list(set(now_tags)-set(new_tags))
-            if remove_tags:
-                for tag in remove_tags:
-                    project.tags.remove(Tag.objects.get(name=tag))
+            if project_data.tags:
+                now_tags = project.tags.values_list('name', flat=True)
+                new_tags = project_data.tags
+                add_tags = list(set(new_tags)-set(now_tags))
+                if add_tags:
+                    for tag in add_tags:
+                        project.tags.add(Tag.objects.get(name=tag))
+                remove_tags = list(set(now_tags)-set(new_tags))
+                if remove_tags:
+                    for tag in remove_tags:
+                        project.tags.remove(Tag.objects.get(name=tag))
         except Project.model.DoesNotExist:
             return None
         return UpdateProject(project=project)
