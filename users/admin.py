@@ -1,4 +1,4 @@
-from .models import User, Department,Team,Course,University
+from .models import User, Department,Team,Course,University,Like
 from django.contrib.auth.admin import UserAdmin
 from django.contrib import admin
 from django import forms
@@ -50,7 +50,7 @@ class AdminUserAdminForm(forms.ModelForm):
 class AdminUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        (_('URL info'), {'fields': ('header', 'logo','url')}),
+        (_('URL info'), {'fields': ('header', 'thumbnail', 'logo','url')}),
         (_('Personal info'), {'fields': ('username', 'position','content','university','department','course','teams','projects','tags')}),
         (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
                                        'groups', 'user_permissions')}),
@@ -60,3 +60,8 @@ class AdminUserAdmin(UserAdmin):
     search_fields = ('username', 'position', 'email','course__name','university__name','department__name')
     filter_horizontal = ('groups', 'user_permissions','teams','projects','tags')
     form = AdminUserAdminForm
+
+@admin.register(Like)
+class AdminLike(admin.ModelAdmin):
+    list_display = ('created_at','user','project')
+    search_fields = ('created_at','user','project')
