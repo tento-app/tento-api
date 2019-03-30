@@ -4,15 +4,15 @@ from django.core.validators import RegexValidator
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django_resized import ResizedImageField
+from PIL import Image
 # from users.models import Team
 # Create your models here.
 
 class Tag(models.Model):
     alphanumeric = RegexValidator(r'^[0-9a-zA-Zぁ-んァ-ヶー一-龠]*$', '大小英数字+だけね')
     name = models.CharField(_('タグ'), max_length=150, blank=True, validators=[alphanumeric])
-    logo = models.ImageField(_('logo'),upload_to='tag/', blank=True)
-    # vcolor = RegexValidator(r'^[0-9a-zA-Z]*$', '英数字だけね')
-    # color = models.CharField(_('カラーコード'), max_length=6, blank=True, validators=[vcolor])
+    logo = ResizedImageField(_('logo'),upload_to='tag/', size=[200, 200], crop=['middle', 'center'], blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -36,7 +36,9 @@ class Project(models.Model):
     # キャンプ
     name = models.CharField(_('タイトル'), max_length=100, blank=True, null=True)
     content = models.TextField(_('内容'), blank=True, null=True)
-    header = models.ImageField(_('ヘッダー'),upload_to='header/', blank=True, null=True)
+    # header = models.ImageField(_('ヘッダー'),upload_to='header/', blank=True, null=True)
+    header = ResizedImageField(_('ヘッダー'),upload_to='header/', size=[1920, 540], crop=['middle', 'center'], blank=True, null=True)
+    thumbnail = ResizedImageField(_('ヘッダーthumbnail'),upload_to='thumbnail/', size=[500, 300], crop=['middle', 'center'], blank=True, null=True)
     place = models.CharField(_('開催場所'), max_length=100, blank=True, null=True)
     contact = models.CharField(_('連絡先'), max_length=100, blank=True, null=True)
     tags = models.ManyToManyField(

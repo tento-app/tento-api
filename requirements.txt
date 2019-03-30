@@ -13,4 +13,4 @@ uwsgi
 django-cors-headers==2.5.0
 django-request-logging==0.6.7
 dateutils==0.6.6
-django-stdimage==4.0.1
+django-resized==0.3.9

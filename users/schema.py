@@ -95,6 +95,9 @@ class Query(graphene.ObjectType):
 
     like = relay.Node.Field(LikeNode)
     all_likes = DjangoFilterConnectionField(LikeNode)
+    @login_required
+    def resolve_all_likes(self, info, **kwargs):
+        return Like.objects.filter(user=info.context.user).order_by('-created_at')
 
     university = relay.Node.Field(UniversityNode)
     all_university = DjangoFilterConnectionField(UniversityNode)
@@ -184,9 +187,14 @@ class UpdateUser(graphene.Mutation):
         if user_data.url:  user.url = user_data.url
         if user_data.position:  user.position = user_data.position
         user.save()
-        if user_data.tags:
-            for tag in user_data.tags:
-                user.tags.add(Tag.objects.get(name=tag))
+        now_tags = user.tags.values_list('name', flat=True)
+        new_tags = user_data.tags
+        add_tags = list(set(new_tags)-set(now_tags))
+        remove_tags = list(set(now_tags)-set(new_tags))
+        for tag in add_tags:
+            user.tags.add(Tag.objects.get(name=tag))
+        for tag in remove_tags:
+            user.tags.remove(Tag.objects.get(name=tag))
         return UpdateUser(user=user)
 
 class ChangePassword(graphene.Mutation):
@@ -227,14 +235,18 @@ class Liked(graphene.Mutation):
             db_id = from_global_id(like_id)
             like = Like.objects.get(pk=db_id[1])
             like.delete()
-        else:
+            success=True
+        elif project_id:
             db_id = from_global_id(project_id)
             project = Project.objects.get(pk=db_id[1])
             Like.objects.create(
                 user=info.context.user,
                 project=project
             )
-        return Liked(success=True)
+            success=True
+        else:
+            success=False
+        return Liked(success=success)
 
 class Mutation(graphene.ObjectType):
     create_user = CreateUser.Field()

@@ -147,9 +147,14 @@ class UpdateProject(graphene.Mutation):
             if project_data.start_at: project.start_at = project_data.start_at
             if project_data.header: project.header = project_data.header
             project.save()
-            if project_data.tags:
-                for tag in project_data.tags:
-                    project.tags.add(Tag.objects.get(name=tag))
+            now_tags = project.tags.values_list('name', flat=True)
+            new_tags = project_data.tags
+            add_tags = list(set(new_tags)-set(now_tags))
+            remove_tags = list(set(now_tags)-set(new_tags))
+            for tag in add_tags:
+                project.tags.add(Tag.objects.get(name=tag))
+            for tag in remove_tags:
+                project.tags.remove(Tag.objects.get(name=tag))
         except Project.model.DoesNotExist:
             return None
         return UpdateProject(project=project)
@@ -159,7 +164,8 @@ class JoinProject(graphene.Mutation):
     class Arguments:
         project_id  = graphene.String(required=True) # project_idはgraphql api上のid
         token  = graphene.String(required=True)
-    project = graphene.Field(ProjectNode)
+    
+    success = graphene.Boolean()
 
     @staticmethod
     @login_required
@@ -168,9 +174,26 @@ class JoinProject(graphene.Mutation):
         project = Project.objects.get(pk=db_id[1])
         user = info.context.user
         user.projects.add(project)
-        return UpdateProject(project=project)
+        return UpdateProject(success=True)
+
+class OutProject(graphene.Mutation):
+    class Arguments:
+        project_id  = graphene.String(required=True) # project_idはgraphql api上のid
+        token  = graphene.String(required=True)
+    
+    success = graphene.Boolean()
+
+    @staticmethod
+    @login_required
+    def mutate(root, info, token=None, project_id=None):
+        db_id = from_global_id(project_id)
+        project = Project.objects.get(pk=db_id[1])
+        user = info.context.user
+        user.projects.remove(project)
+        return OutProject(success=True)
 
 class Mutation(graphene.ObjectType):
     create_project = CreateProject.Field()
     update_project = UpdateProject.Field()
     join_project = JoinProject.Field()
+    out_project = OutProject.Field()
