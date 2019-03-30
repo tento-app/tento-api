@@ -148,6 +148,7 @@ class CreateUser(graphene.Mutation):
             password = user_data.password,
             content = user_data.content,
             header = user_data.header,
+            thumbnail=user_data.header,
             logo = user_data.logo,
             url = user_data.url,
             position = user_data.position,
@@ -182,19 +183,24 @@ class UpdateUser(graphene.Mutation):
         if user_data.name:  user.name = user_data.name
         if user_data.email:  user.email = user_data.email
         if user_data.content:  user.content = user_data.content
-        if user_data.header:  user.header = user_data.header
+        if user_data.header:
+            user.header = user_data.header
+            user.thumbnail = user_data.header
         if user_data.logo:  user.logo = user_data.logo
         if user_data.url:  user.url = user_data.url
         if user_data.position:  user.position = user_data.position
         user.save()
-        now_tags = user.tags.values_list('name', flat=True)
-        new_tags = user_data.tags
-        add_tags = list(set(new_tags)-set(now_tags))
-        remove_tags = list(set(now_tags)-set(new_tags))
-        for tag in add_tags:
-            user.tags.add(Tag.objects.get(name=tag))
-        for tag in remove_tags:
-            user.tags.remove(Tag.objects.get(name=tag))
+        if user_data.tags:
+            now_tags = user.tags.values_list('name', flat=True)
+            new_tags = user_data.tags
+            add_tags = list(set(new_tags)-set(now_tags))
+            if add_tags:
+                for tag in add_tags:
+                    user.tags.add(Tag.objects.get(name=tag))
+            remove_tags = list(set(now_tags)-set(new_tags))
+            if remove_tags:
+                for tag in remove_tags:
+                    user.tags.remove(Tag.objects.get(name=tag))
         return UpdateUser(user=user)
 
 class ChangePassword(graphene.Mutation):
@@ -222,21 +228,15 @@ class ChangePassword(graphene.Mutation):
 
 class Liked(graphene.Mutation):
     class Arguments:
-        like_id = graphene.String()
-        project_id = graphene.String()
+        project_id = graphene.String(required=True)
         token = graphene.String(required=True)
 
     success = graphene.Boolean()
 
     @staticmethod
     @login_required
-    def mutate(self, info, project_id=None, is_liked=None, like_id=None):
-        if like_id:
-            db_id = from_global_id(like_id)
-            like = Like.objects.get(pk=db_id[1])
-            like.delete()
-            success=True
-        elif project_id:
+    def mutate(self, info, project_id=None):
+        if project_id:
             db_id = from_global_id(project_id)
             project = Project.objects.get(pk=db_id[1])
             Like.objects.create(
@@ -248,8 +248,28 @@ class Liked(graphene.Mutation):
             success=False
         return Liked(success=success)
 
+class Unliked(graphene.Mutation):
+    class Arguments:
+        like_id = graphene.String(required=True)
+        token = graphene.String(required=True)
+
+    success = graphene.Boolean()
+
+    @staticmethod
+    @login_required
+    def mutate(self, info, like_id=None):
+        if like_id:
+            db_id = from_global_id(like_id)
+            like = Like.objects.get(pk=db_id[1])
+            like.delete()
+            success=True
+        else:
+            success=False
+        return Liked(success=success)
+
 class Mutation(graphene.ObjectType):
     create_user = CreateUser.Field()
     update_user = UpdateUser.Field()
     change_password = ChangePassword.Field()
     liked = Liked.Field()
+    unliked = Unliked.Field()

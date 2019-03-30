@@ -111,7 +111,8 @@ class CreateProject(graphene.Mutation):
             contact=project_data.contact,
             place=project_data.place,
             start_at=dateutil.parser.parse(project_data.startat),
-            header=project_data.header
+            header=project_data.header,
+            thumbnail=project_data.header,
             )
         # if project_data.name: project.name = project_data.name
         # if project_data.content: project.content = project_data.content
@@ -145,16 +146,20 @@ class UpdateProject(graphene.Mutation):
             if project_data.contact: project.contact = project_data.contact
             if project_data.place: project.place = project_data.place
             if project_data.start_at: project.start_at = project_data.start_at
-            if project_data.header: project.header = project_data.header
+            if project_data.header:
+                project.header = project_data.header
+                project.thumbnail = project_data.header
             project.save()
             now_tags = project.tags.values_list('name', flat=True)
             new_tags = project_data.tags
             add_tags = list(set(new_tags)-set(now_tags))
+            if add_tags:
+                for tag in add_tags:
+                    project.tags.add(Tag.objects.get(name=tag))
             remove_tags = list(set(now_tags)-set(new_tags))
-            for tag in add_tags:
-                project.tags.add(Tag.objects.get(name=tag))
-            for tag in remove_tags:
-                project.tags.remove(Tag.objects.get(name=tag))
+            if remove_tags:
+                for tag in remove_tags:
+                    project.tags.remove(Tag.objects.get(name=tag))
         except Project.model.DoesNotExist:
             return None
         return UpdateProject(project=project)
