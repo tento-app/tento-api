@@ -114,13 +114,6 @@ class CreateProject(graphene.Mutation):
             header=project_data.header,
             thumbnail=project_data.header,
             )
-        # if project_data.name: project.name = project_data.name
-        # if project_data.content: project.content = project_data.content
-        # if project_data.contact: project.contact = project_data.contact
-        # if project_data.place: project.place = project_data.place
-        # if project_data.header: project.header = project_data.header
-        # if project_data.start_at: project.start_at = project_data.start_at
-        # project.save()
         if project_data.tags:
             for tag in project_data.tags:
                 if Tag.objects.get(name=tag):
@@ -179,8 +172,12 @@ class JoinProject(graphene.Mutation):
         db_id = from_global_id(project_id)
         project = Project.objects.get(pk=db_id[1])
         user = info.context.user
-        user.projects.add(project)
-        return UpdateProject(success=True)
+        try:
+            user.projects.add(project)
+            success=True
+        except:
+            success=False
+        return UpdateProject(success=success)
 
 class OutProject(graphene.Mutation):
     class Arguments:
@@ -195,11 +192,36 @@ class OutProject(graphene.Mutation):
         db_id = from_global_id(project_id)
         project = Project.objects.get(pk=db_id[1])
         user = info.context.user
-        user.projects.remove(project)
+        try:
+            user.projects.remove(project)
+            success=True
+        except:
+            success=False
         return OutProject(success=True)
+
+class isJoined(graphene.Mutation):
+    class Arguments:
+        project_id = graphene.String(required=True)
+        token = graphene.String()
+
+    is_joined = graphene.Boolean()
+
+    @staticmethod
+    def mutate(self, info, project_id=None, token=None):
+        if token:
+            db_id = from_global_id(project_id)
+            project = Project.objects.get(pk=db_id[1])
+            if project.users.filter(pk=info.context.user.uuid).exists():
+                is_joined=True
+            else:
+                is_joined=False
+        else:
+            is_joined=False
+        return isJoined(is_joined=is_joined)
 
 class Mutation(graphene.ObjectType):
     create_project = CreateProject.Field()
     update_project = UpdateProject.Field()
     join_project = JoinProject.Field()
     out_project = OutProject.Field()
+    is_joined = isJoined.Field()
