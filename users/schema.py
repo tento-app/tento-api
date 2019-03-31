@@ -7,6 +7,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 from graphql_jwt.decorators import login_required
 
 from users.models import User,Course,Team,University,Department,Like
+from gql.models import Project
 
 from django.core.mail import send_mail
 from graphql_relay.node.node import from_global_id
