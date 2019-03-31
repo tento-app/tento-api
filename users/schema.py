@@ -236,7 +236,7 @@ class Liked(graphene.Mutation):
     @staticmethod
     @login_required
     def mutate(self, info, project_id=None):
-        if project_id:
+        try:
             db_id = from_global_id(project_id)
             project = Project.objects.get(pk=db_id[1])
             Like.objects.create(
@@ -244,26 +244,27 @@ class Liked(graphene.Mutation):
                 project=project
             )
             success=True
-        else:
+        except:
             success=False
         return Liked(success=success)
 
 class Unliked(graphene.Mutation):
     class Arguments:
-        like_id = graphene.String(required=True)
+        project_id = graphene.String(required=True)
         token = graphene.String(required=True)
 
     success = graphene.Boolean()
 
     @staticmethod
     @login_required
-    def mutate(self, info, like_id=None):
-        if like_id:
-            db_id = from_global_id(like_id)
-            like = Like.objects.get(pk=db_id[1])
+    def mutate(self, info, project_id=None):
+        try:
+            db_id = from_global_id(project_id)
+            project = Project.objects.get(pk=db_id[1])
+            like = Like.objects.get(user=info.context.user,project=project)
             like.delete()
             success=True
-        else:
+        except:
             success=False
         return Liked(success=success)
 
