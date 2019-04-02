@@ -135,14 +135,12 @@ class UserInput(graphene.InputObjectType):
 
 class CreateUser(graphene.Mutation):
     class Arguments:
-        user_data =UserInput()
-        token = graphene.String(required=True)
+        user_data =UserInput(required=True)
 
     user = graphene.Field(UserNode)
 
     @staticmethod
-    @login_required
-    def mutate(root, info, token=None,user_data=None):
+    def mutate(root, info, user_data=None):
         user = User.objects.create(
             email = user_data.email,
             usernmae = user_data.usernmae,
