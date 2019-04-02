@@ -122,7 +122,7 @@ class Query(graphene.ObjectType):
 
 
 class UserInput(graphene.InputObjectType):
-    name = graphene.String(required=True)
+    usernmae = graphene.String(required=True)
     password = graphene.String(required=True)
     email = graphene.String(required=True)
     content = graphene.String()
@@ -159,7 +159,7 @@ class CreateUser(graphene.Mutation):
         return CreateUser(user=user)
 
 class UpdateUserInput(graphene.InputObjectType):
-    name = graphene.String()
+    usernmae = graphene.String()
     email = graphene.String()
     content = graphene.String()
     header = graphene.String()
@@ -179,7 +179,7 @@ class UpdateUser(graphene.Mutation):
     @login_required
     def mutate(root, info, token=None,user_data=None):
         user = info.context.user
-        if user_data.name:  user.name = user_data.name
+        if user_data.usernmae:  user.usernmae = user_data.usernmae
         if user_data.email:  user.email = user_data.email
         if user_data.content:  user.content = user_data.content
         if user_data.header:
