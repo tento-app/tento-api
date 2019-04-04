@@ -50,20 +50,33 @@ class isPubricFilter(django_filters.FilterSet):
     class Meta:
         model = Project
         fields = {
-        'name': ['exact', 'icontains', 'istartswith'],
+        'name': ['exact', 'icontains', 'istartswith','in'],
+        'content': ['exact', 'icontains', 'istartswith'],
+        'contact': ['exact', 'icontains', 'istartswith'],
         'place': ['exact', 'icontains', 'istartswith'],
         'users': ['exact'],
-        'start_at' : ['exact'],
-        'created_at' : ['exact', 'year__gt'],
-        'updated_at' : ['exact', 'year__gt'],
+        'start_at' : ['exact',"gte", "lte"],
+        'created_at' : ['exact', 'year__gt',"gte", "lte"],
+        'updated_at' : ['exact', 'year__gt',"gte", "lte"],
         'is_public': ['exact'],
+        'is_open': ['exact'],
         'tags': ['exact'],
-        'tags__name': ['exact', 'icontains', 'istartswith'],
+        'tags__name': ['exact', 'icontains', 'istartswith','in'],
         }
+
+    # def __init__(self, *args, **kwargs):
+    #     self.method_multivalue = kwargs.pop('method_multivalue')
+    #     super(MultiValueCharFilter, self).__init__(*args, **kwargs)
+    # def filter(self, qs, value):
+    #     q = Q()
+    #     for v in value.split('|'):
+    #         q = q | Q(**{self.method_multivalue: v})
+    #     return qs.filter(q)
+
     @property
     def qs(self):
-        # The query context can be found in self.request.
-        return super(isPubricFilter, self).qs.filter(is_public=True).order_by('created_at').reverse()
+        # The query context can be found in self.request.q = Q()
+        return super(isPubricFilter, self).qs.filter(is_public=True).order_by('-created_at')
 
 class Query(graphene.ObjectType):
     category = relay.Node.Field(CategoryNode)
@@ -77,11 +90,11 @@ class Query(graphene.ObjectType):
     join_projects = DjangoFilterConnectionField(ProjectNode, token=graphene.String(required=True))
     @login_required
     def resolve_join_projects(self, info, **kwargs):
-        return info.context.user.projects.filter(is_public=True)
+        return info.context.user.projects.filter(is_public=True).order_by('-created_at')
     host_projects = DjangoFilterConnectionField(ProjectNode, token=graphene.String(required=True))
     @login_required
     def resolve_host_projects(self, info, **kwargs):
-        return Project.objects.filter(user=info.context.user)    
+        return Project.objects.filter(user=info.context.user).order_by('-created_at')
 
 
 class ProjectInput(graphene.InputObjectType):
