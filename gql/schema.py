@@ -106,6 +106,7 @@ class ProjectInput(graphene.InputObjectType):
     header = Upload()
     tags = graphene.List(graphene.String)
     isPublic = graphene.Boolean()
+    isOpen = graphene.Boolean()
 
 class CreateProject(graphene.Mutation):
     class Arguments:
@@ -147,29 +148,32 @@ class UpdateProject(graphene.Mutation):
         db_id = from_global_id(project_id)
         try:
             project = Project.objects.get(pk=db_id[1])
-            if project_data.name: project.name = project_data.name
-            if project_data.content: project.content = project_data.content
-            if project_data.contact: project.contact = project_data.contact
-            if project_data.place: project.place = project_data.place
-            if project_data.start_at: project.start_at = project_data.start_at
-            if project_data.header:
-                project.header = project_data.header
-                project.thumbnail = project_data.header
-            project.save()
-            if project_data.tags:
-                now_tags = project.tags.values_list('name', flat=True)
-                new_tags = project_data.tags
-                add_tags = list(set(new_tags)-set(now_tags))
-                if add_tags:
-                    for tag in add_tags:
-                        project.tags.add(Tag.objects.get(name=tag))
-                remove_tags = list(set(now_tags)-set(new_tags))
-                if remove_tags:
-                    for tag in remove_tags:
-                        project.tags.remove(Tag.objects.get(name=tag))
-        except Project.model.DoesNotExist:
+            if(project.user == info.context.user):
+                if project_data.name: project.name = project_data.name
+                if project_data.content: project.content = project_data.content
+                if project_data.contact: project.contact = project_data.contact
+                if project_data.place: project.place = project_data.place
+                if project_data.startat: project.start_at = dateutil.parser.parse(project_data.startat)
+                if project_data.isPublic: project.is_public = project_data.isPublic
+                if project_data.isOpen: project.is_open = project_data.isOpen
+                if project_data.header:
+                    project.header = project_data.header
+                    project.thumbnail = project_data.header
+                project.save()
+                if project_data.tags:
+                    now_tags = project.tags.values_list('name', flat=True)
+                    new_tags = project_data.tags
+                    add_tags = list(set(new_tags)-set(now_tags))
+                    if add_tags:
+                        for tag in add_tags:
+                            project.tags.add(Tag.objects.get(name=tag))
+                    remove_tags = list(set(now_tags)-set(new_tags))
+                    if remove_tags:
+                        for tag in remove_tags:
+                            project.tags.remove(Tag.objects.get(name=tag))
+        except:
             return None
-        return UpdateProject(project=project)
+        return  UpdateProject(project=project)
 
 
 class JoinProject(graphene.Mutation):
@@ -215,11 +219,12 @@ class OutProject(graphene.Mutation):
 class isJoined(graphene.Mutation):
     class Arguments:
         project_id = graphene.String(required=True)
-        token = graphene.String()
+        token = graphene.String(required=True)
 
     is_joined = graphene.Boolean()
 
     @staticmethod
+    @login_required
     def mutate(self, info, project_id=None, token=None):
         if token:
             db_id = from_global_id(project_id)

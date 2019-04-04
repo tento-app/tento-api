@@ -272,11 +272,12 @@ class Unliked(graphene.Mutation):
 class isLiked(graphene.Mutation):
     class Arguments:
         project_id = graphene.String(required=True)
-        token = graphene.String()
+        token = graphene.String(required=True)
 
     is_liked = graphene.Boolean()
 
     @staticmethod
+    @login_required
     def mutate(self, info, project_id=None, token=None):
         if token:
             db_id = from_global_id(project_id)
