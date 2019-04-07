@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = ')(v62h9^+l-xvi@x3pmh0#l-n)1115o(14#onwade8#k7uuff3'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['api.tento.app','tento.app','127.0.0.1']
 
