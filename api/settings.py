@@ -24,7 +24,7 @@ SECRET_KEY = ')(v62h9^+l-xvi@x3pmh0#l-n)1115o(14#onwade8#k7uuff3'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['api.tento.app','nuxt.tento.app','tento.app','127.0.0.1','localhost']
+ALLOWED_HOSTS = ['api.tento.app','tento.app','127.0.0.1']
 
 
 # Application definition
@@ -164,8 +164,8 @@ GRAPHQL_JWT = {
 
 CORS_ORIGIN_WHITELIST = (
     'localhost:3000',
-    '127.0.0.1:3000',
     'nuxt.tento.app',
+    'tento.app',
 )
 
 # Email

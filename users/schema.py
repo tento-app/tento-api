@@ -141,10 +141,9 @@ class CreateUser(graphene.Mutation):
 
     @staticmethod
     def mutate(root, info, user_data=None):
-        user = User.objects.create(
+        user = User(
             email = user_data.email,
             username = user_data.username,
-            password = user_data.password,
             content = user_data.content,
             header = user_data.header,
             thumbnail=user_data.header,
@@ -152,9 +151,11 @@ class CreateUser(graphene.Mutation):
             url = user_data.url,
             position = user_data.position,
         )
+        user.set_password(user_data.password)
         if user_data.tags:
             for tag in user_data.tags:
                 user.tags.add(Tag.objects.get(name=tag))
+        user.save()
         send_mail('Subject here','Here is the message.','from@example.com',['to@example.com'])
         return CreateUser(user=user)
 
