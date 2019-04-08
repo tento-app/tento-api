@@ -27,5 +27,5 @@ urlpatterns = [
     # path('martor/', include('martor.urls')),
     path('admin/', admin.site.urls),
     # path('',include('gql.urls')),
-    path('', csrf_exempt(FileUploadGraphQLView.as_view(graphiql=True))),
+    path('', csrf_exempt(FileUploadGraphQLView.as_view(graphiql=False))),
 ]
