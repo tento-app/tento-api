@@ -1,5 +1,5 @@
 db.sqlite3
-local_settings.py
+api/local_settings.py
 .env
 
 .vscode
