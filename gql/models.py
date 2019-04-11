@@ -12,7 +12,7 @@ from PIL import Image
 class Tag(models.Model):
     alphanumeric = RegexValidator(r'^[0-9a-zA-Zぁ-んァ-ヶー一-龠]*$', '大小英数字+だけね')
     name = models.CharField(_('タグ'), max_length=150, blank=True, validators=[alphanumeric])
-    logo = ResizedImageField(_('logo'),upload_to='tag/', size=[200, 200], crop=['middle', 'center'], blank=True, null=True)
+    logo = ResizedImageField(_('logo'),upload_to='tag/', size=[200, 200], crop=['middle', 'center'], blank=False, null=False)
 
     def __str__(self):
         return self.name
@@ -22,9 +22,9 @@ class Tag(models.Model):
         verbose_name_plural = _('タグ')
 
 class Category(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, blank=False, null=False)
     vcolor = RegexValidator(r'^[0-9a-zA-Z]*$', '英数字だけね')
-    color = models.CharField(_('カラーコード'), max_length=6, blank=True, validators=[vcolor])
+    color = models.CharField(_('カラーコード'), max_length=6, validators=[vcolor], blank=False, null=False)
     def __str__(self):
         return self.name
     class Meta:
@@ -34,10 +34,10 @@ class Category(models.Model):
 
 class Project(models.Model):
     # キャンプ
-    name = models.CharField(_('タイトル'), max_length=100, blank=True, null=True)
+    name = models.CharField(_('タイトル'), max_length=100, blank=False, null=False)
     content = models.TextField(_('内容'), blank=True, null=True)
     # header = models.ImageField(_('ヘッダー'),upload_to='header/', blank=True, null=True)
-    header = ResizedImageField(_('ヘッダー'),upload_to='header/', size=[1920, 540], crop=['middle', 'center'], blank=True, null=True)
+    header = ResizedImageField(_('ヘッダー'),upload_to='header/', size=[1920, 1080], crop=['middle', 'center'], blank=True, null=True)
     thumbnail = ResizedImageField(_('ヘッダーthumbnail'),upload_to='thumbnail/', size=[500, 300], crop=['middle', 'center'], blank=True, null=True)
     place = models.CharField(_('開催場所'), max_length=100, blank=True, null=True)
     contact = models.CharField(_('連絡先'), max_length=100, blank=True, null=True)
@@ -49,7 +49,7 @@ class Project(models.Model):
         related_name="projects",
     )
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="host_projects", verbose_name=_('代表者'), on_delete=models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="host_projects", verbose_name=_('代表者'), on_delete=models.CASCADE, blank=False, null=False)
 
     is_open = models.BooleanField(
         _('open status'),
@@ -65,7 +65,7 @@ class Project(models.Model):
             '公開かどうか'),
     )    
 
-    start_at = models.DateTimeField(default=timezone.now, blank=True)
+    start_at = models.DateTimeField(default=timezone.now, blank=True, null=True)
 
     created_at = models.DateTimeField(default=timezone.now, blank=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True)

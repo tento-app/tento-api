@@ -12,7 +12,7 @@ from gql.models import Project, Tag
 from django.core.mail import send_mail
 from graphql_relay.node.node import from_global_id
 from graphene_file_upload.scalars import Upload
-
+import re
 
 class UniversityNode(DjangoObjectType):
     class Meta:
@@ -133,6 +133,29 @@ class UserInput(graphene.InputObjectType):
     tags = graphene.List(graphene.String)
     # is_public = graphene.Boolean()
 
+class validateUser:
+    def valUsername(self,username):
+        if username:
+            val_username = re.compile(r'^[a-zA-Z0-9_]{1,100}$')
+            if val_username.match(username) is not None: return True
+            else: message = "username_error" 
+        raise graphene.FieldError(message)
+
+
+    def valPassword(self,password):
+        if password:
+            val_password = re.compile(r'^[a-zA-Z0-9!-~︰-＠]{6,100}$')
+            if val_password.match(password) is not None: return True
+            else: message = "password_error" 
+        raise graphene.FieldError(message)
+
+    def valEmail(self,email):
+        if email:
+            val_email = re.compile('[A-Za-z0-9\._+]+@[A-Za-z]+\.[A-Za-z]')
+            if val_email.match(email) is not None: return True
+            else: message = "email_error" 
+        raise graphene.FieldError(message)
+
 class CreateUser(graphene.Mutation):
     class Arguments:
         user_data =UserInput(required=True)
@@ -141,6 +164,9 @@ class CreateUser(graphene.Mutation):
 
     @staticmethod
     def mutate(root, info, user_data=None):
+        validateUser.valUsername(user_data.username)
+        validateUser.valPassword(user_data.password)
+        validateUser.valEmail(user_data.email)
         user = User(
             email = user_data.email,
             username = user_data.username,
@@ -205,8 +231,8 @@ class UpdateUser(graphene.Mutation):
 
 class ChangePassword(graphene.Mutation):
     class Arguments:
-        new_password = graphene.String()
-        old_password = graphene.String()
+        new_password = graphene.String(required=True)
+        old_password = graphene.String(required=True)
         token = graphene.String(required=True)
 
     success = graphene.Boolean()
