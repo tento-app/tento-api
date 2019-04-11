@@ -22,9 +22,9 @@ class Tag(models.Model):
         verbose_name_plural = _('タグ')
 
 class Category(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, blank=False, null=False)
     vcolor = RegexValidator(r'^[0-9a-zA-Z]*$', '英数字だけね')
-    color = models.CharField(_('カラーコード'), max_length=6, blank=True, validators=[vcolor])
+    color = models.CharField(_('カラーコード'), max_length=6, validators=[vcolor], blank=False, null=False)
     def __str__(self):
         return self.name
     class Meta:
@@ -34,10 +34,10 @@ class Category(models.Model):
 
 class Project(models.Model):
     # キャンプ
-    name = models.CharField(_('タイトル'), max_length=100, blank=True, null=True)
+    name = models.CharField(_('タイトル'), max_length=100, blank=False, null=False, default="タイトル未記入")
     content = models.TextField(_('内容'), blank=True, null=True)
     # header = models.ImageField(_('ヘッダー'),upload_to='header/', blank=True, null=True)
-    header = ResizedImageField(_('ヘッダー'),upload_to='header/', size=[1920, 540], crop=['middle', 'center'], blank=True, null=True)
+    header = ResizedImageField(_('ヘッダー'),upload_to='header/', size=[1920, 1080], crop=['middle', 'center'], blank=True, null=True)
     thumbnail = ResizedImageField(_('ヘッダーthumbnail'),upload_to='thumbnail/', size=[500, 300], crop=['middle', 'center'], blank=True, null=True)
     place = models.CharField(_('開催場所'), max_length=100, blank=True, null=True)
     contact = models.CharField(_('連絡先'), max_length=100, blank=True, null=True)
@@ -65,7 +65,7 @@ class Project(models.Model):
             '公開かどうか'),
     )    
 
-    start_at = models.DateTimeField(default=timezone.now, blank=True)
+    start_at = models.DateTimeField(default=timezone.now, blank=True, null=True)
 
     created_at = models.DateTimeField(default=timezone.now, blank=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True)

@@ -12,7 +12,8 @@ from gql.models import Project, Tag
 from django.core.mail import send_mail
 from graphql_relay.node.node import from_global_id
 from graphene_file_upload.scalars import Upload
-
+import re
+from graphql import GraphQLError
 
 class UniversityNode(DjangoObjectType):
     class Meta:
@@ -133,6 +134,26 @@ class UserInput(graphene.InputObjectType):
     tags = graphene.List(graphene.String)
     # is_public = graphene.Boolean()
 
+class validateUser(object):
+    def valUsername(self,username):
+        if username:
+            val_username = re.compile(r'^[a-zA-Z0-9_]{1,30}$')
+            if val_username.match(username) is not None: return True
+        raise GraphQLError("username_error")
+
+
+    def valPassword(self,password):
+        if password:
+            val_password = re.compile(r'^[a-zA-Z0-9!-~︰-＠]{6,100}$')
+            if val_password.match(password) is not None: return True
+        raise GraphQLError("password_error")
+
+    def valEmail(self,email):
+        if email:
+            val_email = re.compile('[A-Za-z0-9\._+]+@[A-Za-z]+\.[A-Za-z]')
+            if val_email.match(email) is not None: return True
+        raise GraphQLError("email_error")
+
 class CreateUser(graphene.Mutation):
     class Arguments:
         user_data =UserInput(required=True)
@@ -141,22 +162,24 @@ class CreateUser(graphene.Mutation):
 
     @staticmethod
     def mutate(root, info, user_data=None):
-        user = User(
-            email = user_data.email,
-            username = user_data.username,
-            content = user_data.content,
-            header = user_data.header,
-            thumbnail=user_data.header,
-            logo = user_data.logo,
-            url = user_data.url,
-            position = user_data.position,
-        )
-        user.set_password(user_data.password)
-        if user_data.tags:
-            for tag in user_data.tags:
-                user.tags.add(Tag.objects.get(name=tag))
-        user.save()
-        send_mail('Subject here','Here is the message.','from@example.com',['to@example.com'])
+        validateUsers = validateUser()
+        if validateUsers.valUsername(user_data.username) and validateUsers.valPassword(user_data.password) and validateUsers.valEmail(user_data.email):
+            user = User(
+                email = user_data.email,
+                username = user_data.username,
+                content = user_data.content,
+                header = user_data.header,
+                thumbnail=user_data.header,
+                logo = user_data.logo,
+                url = user_data.url,
+                position = user_data.position,
+            )
+            user.set_password(user_data.password)
+            if user_data.tags:
+                for tag in user_data.tags:
+                    user.tags.add(Tag.objects.get(name=tag))
+            user.save()
+            send_mail('Subject here','Here is the message.','from@example.com',['to@example.com'])
         return CreateUser(user=user)
 
 class UpdateUserInput(graphene.InputObjectType):
@@ -179,9 +202,12 @@ class UpdateUser(graphene.Mutation):
     @staticmethod
     @login_required
     def mutate(root, info, token=None,user_data=None):
+        validateUsers = validateUser()
         user = info.context.user
-        if user_data.username:  user.username = user_data.username
-        if user_data.email:  user.email = user_data.email
+        if user_data.username:
+            if validateUsers.valUsername(user_data.username):  user.username = user_data.username
+        if user_data.email:
+            if validateUsers.valEmail(user_data.email):  user.email = user_data.email
         if user_data.content:  user.content = user_data.content
         if user_data.header:
             user.header = user_data.header
@@ -205,8 +231,8 @@ class UpdateUser(graphene.Mutation):
 
 class ChangePassword(graphene.Mutation):
     class Arguments:
-        new_password = graphene.String()
-        old_password = graphene.String()
+        new_password = graphene.String(required=True)
+        old_password = graphene.String(required=True)
         token = graphene.String(required=True)
 
     success = graphene.Boolean()
@@ -214,15 +240,19 @@ class ChangePassword(graphene.Mutation):
     @staticmethod
     @login_required
     def mutate(root, info, token=None,new_password=None, old_password=None):
-        try:
-            user = info.context.user
-            if user.check_password(old_password):
-                user.set_password(new_password)
-                user.save()
-                success = True
-            else:
+        validateUsers = validateUser()
+        if validateUsers.valPassword(new_password) and validateUsers.valPassword(old_password):
+            try:
+                user = info.context.user
+                if user.check_password(old_password):
+                    user.set_password(new_password)
+                    user.save()
+                    success = True
+                else:
+                    success = False
+            except:
                 success = False
-        except:
+        else:
             success = False
         return ChangePassword(success=success)
 

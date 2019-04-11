@@ -141,7 +141,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             'unique': _("A user with that username already exists."),
         },
     )
-    position = models.CharField(_('position'), max_length=150, blank=True)
+    position = models.CharField(_('position'), max_length=150, blank=True, null=True)
     email = models.EmailField(_('email address'), unique=True)
     university = models.ForeignKey(
         University,
@@ -195,7 +195,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     # likes = models.ManyToManyField('gql.Project',verbose_name=_('likes'),blank=True,help_text=_('likes Project for this user.'),related_name="liked",)
 
     content = models.TextField(_('User content'), blank=True)
-    header = ResizedImageField(_('header'),upload_to='header/', size=[1920, 540], crop=['middle', 'center'], blank=True, null=True)
+    header = ResizedImageField(_('header'),upload_to='header/', size=[1920, 1080], crop=['middle', 'center'], blank=True, null=True)
     thumbnail = ResizedImageField(_('ヘッダーthumbnail'),upload_to='thumbnail/', size=[500, 300], crop=['middle', 'center'], blank=True, null=True)
     # header = models.ImageField(_('header'),upload_to='header/', blank=True)
     url =  models.URLField(_('url'), blank=True)
