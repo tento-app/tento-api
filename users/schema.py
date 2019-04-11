@@ -203,29 +203,30 @@ class UpdateUser(graphene.Mutation):
     @login_required
     def mutate(root, info, token=None,user_data=None):
         validateUsers = validateUser()
-        if validateUsers.valUsername(user_data.username) or validateUsers.valEmail(user_data.email):
-            user = info.context.user
-            if user_data.username:  user.username = user_data.username
-            if user_data.email:  user.email = user_data.email
-            if user_data.content:  user.content = user_data.content
-            if user_data.header:
-                user.header = user_data.header
-                user.thumbnail = user_data.header
-            if user_data.logo:  user.logo = user_data.logo
-            if user_data.url:  user.url = user_data.url
-            if user_data.position:  user.position = user_data.position
-            user.save()
-            if user_data.tags:
-                now_tags = user.tags.values_list('name', flat=True)
-                new_tags = user_data.tags
-                add_tags = list(set(new_tags)-set(now_tags))
-                if add_tags:
-                    for tag in add_tags:
-                        user.tags.add(Tag.objects.get(name=tag))
-                remove_tags = list(set(now_tags)-set(new_tags))
-                if remove_tags:
-                    for tag in remove_tags:
-                        user.tags.remove(Tag.objects.get(name=tag))
+        user = info.context.user
+        if user_data.username:
+            if validateUsers.valUsername(user_data.username):  user.username = user_data.username
+        if user_data.email:
+            if validateUsers.valEmail(user_data.email):  user.email = user_data.email
+        if user_data.content:  user.content = user_data.content
+        if user_data.header:
+            user.header = user_data.header
+            user.thumbnail = user_data.header
+        if user_data.logo:  user.logo = user_data.logo
+        if user_data.url:  user.url = user_data.url
+        if user_data.position:  user.position = user_data.position
+        user.save()
+        if user_data.tags:
+            now_tags = user.tags.values_list('name', flat=True)
+            new_tags = user_data.tags
+            add_tags = list(set(new_tags)-set(now_tags))
+            if add_tags:
+                for tag in add_tags:
+                    user.tags.add(Tag.objects.get(name=tag))
+            remove_tags = list(set(now_tags)-set(new_tags))
+            if remove_tags:
+                for tag in remove_tags:
+                    user.tags.remove(Tag.objects.get(name=tag))
         return UpdateUser(user=user)
 
 class ChangePassword(graphene.Mutation):
