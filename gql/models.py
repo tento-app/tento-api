@@ -12,7 +12,7 @@ from PIL import Image
 class Tag(models.Model):
     alphanumeric = RegexValidator(r'^[0-9a-zA-Zぁ-んァ-ヶー一-龠]*$', '大小英数字+だけね')
     name = models.CharField(_('タグ'), max_length=150, blank=True, validators=[alphanumeric])
-    logo = ResizedImageField(_('logo'),upload_to='tag/', size=[200, 200], crop=['middle', 'center'], blank=False, null=False)
+    logo = ResizedImageField(_('logo'),upload_to='tag/', size=[200, 200], crop=['middle', 'center'], blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -34,7 +34,7 @@ class Category(models.Model):
 
 class Project(models.Model):
     # キャンプ
-    name = models.CharField(_('タイトル'), max_length=100, blank=False, null=False)
+    name = models.CharField(_('タイトル'), max_length=100, blank=False, null=False, default="タイトル未記入")
     content = models.TextField(_('内容'), blank=True, null=True)
     # header = models.ImageField(_('ヘッダー'),upload_to='header/', blank=True, null=True)
     header = ResizedImageField(_('ヘッダー'),upload_to='header/', size=[1920, 1080], crop=['middle', 'center'], blank=True, null=True)
@@ -49,7 +49,7 @@ class Project(models.Model):
         related_name="projects",
     )
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="host_projects", verbose_name=_('代表者'), on_delete=models.CASCADE, blank=False, null=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="host_projects", verbose_name=_('代表者'), on_delete=models.CASCADE, blank=True, null=True)
 
     is_open = models.BooleanField(
         _('open status'),
