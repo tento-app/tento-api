@@ -35,7 +35,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['tento.app','tento.dev','127.0.0.1']
+ALLOWED_HOSTS = ['tento.app','api.tento.app','tento.dev','api.tento.dev','127.0.0.1']
 
 
 # Application definition
@@ -169,8 +169,10 @@ GRAPHQL_JWT = {
 
 CORS_ORIGIN_WHITELIST = (
     'localhost:3000',
-    'tento.dev',
     'tento.app',
+    'nuxt.tento.app',
+    'tento.dev',
+    'nuxt.tento.dev',
 )
 
 # Email
