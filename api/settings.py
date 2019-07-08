@@ -16,12 +16,12 @@ pymysql.install_as_MySQLdb()
 import environ
 env = environ.Env()
 base = environ.Path(__file__) - 2 # two folders back (/a/b/ - 2 = /)
-environ.Env.read_env(env_file=base('.env')) # reading .env file
-
 try:
-    from .local_settings import *
-except ImportError:
+    environ.Env.read_env(env_file=base('.env')) # reading .env file
+except:
+    print("Don't exist .env")
     pass
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,11 +31,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 #SECRET_KEY = ')(v62h9^+l-xvi@x3pmh0#l-n)1115o(14#onwade8#k7uuff3'
-
+SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['tento.app','api.tento.app','tento.dev','api.tento.dev','127.0.0.1']
+ALLOWED_HOSTS = ['tento.app','api.tento.app','tento.dev','api.tento.dev','127.0.0.1','localhost','0.0.0.0']
 
 
 # Application definition
@@ -92,11 +92,11 @@ WSGI_APPLICATION = 'api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASS'),
-        'HOST': env('DB_HOST'),
-        'PORT': env('DB_PORT'),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASS'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
         'OPTIONS': {
            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
        },
@@ -145,8 +145,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static/")
-
+if DEBUG: 
+   STATIC_ROOT = os.path.join(BASE_DIR, '/static')
+else:
+   STATIC_ROOT = os.path.join(BASE_DIR, 'static') 
+   
 # Application definition
 AUTH_USER_MODEL = 'users.User'
 
@@ -177,22 +180,22 @@ CORS_ORIGIN_WHITELIST = (
 
 # Email
 
-EMAIL_HOST = env('EMAIL_HOST')
-EMAIL_PORT = env('EMAIL_PORT')
-EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS = True
+# EMAIL_HOST = os.getenv('EMAIL_HOST')
+# EMAIL_PORT = os.getenv('EMAIL_PORT')
+# EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+# EMAIL_USE_TLS = True
 # python -m smtpd -n -c DebuggingServer localhost:1025
 # from django.core.mail import send_mail, EmailMessage
 # EmailMessage("subject", "message", "xxxxxx@tento.app", ["to@gmail.com"],["bcc@gmail.com"] ).send()
 
-DEFAULT_FILE_STORAGE = env('DEFAULT_FILE_STORAGE')
-SWIFT_AUTH_URL = env('SWIFT_AUTH_URL')
-SWIFT_USERNAME = env('SWIFT_USERNAME')
-SWIFT_PASSWORD = env('SWIFT_PASSWORD')
-SWIFT_TENANT_NAME = env('SWIFT_TENANT_NAME')
-SWIFT_TENANT_ID = env('SWIFT_TENANT_ID')
-SWIFT_CONTAINER_NAME = env('SWIFT_CONTAINER_NAME')
+DEFAULT_FILE_STORAGE = os.getenv('DEFAULT_FILE_STORAGE')
+SWIFT_AUTH_URL = os.getenv('SWIFT_AUTH_URL')
+SWIFT_USERNAME = os.getenv('SWIFT_USERNAME')
+SWIFT_PASSWORD = os.getenv('SWIFT_PASSWORD')
+SWIFT_TENANT_NAME = os.getenv('SWIFT_TENANT_NAME')
+SWIFT_TENANT_ID = os.getenv('SWIFT_TENANT_ID')
+SWIFT_CONTAINER_NAME = os.getenv('SWIFT_CONTAINER_NAME')
 SWIFT_AUTO_CREATE_CONTAINER = True
 SWIFT_AUTO_CREATE_CONTAINER_PUBLIC = True
 

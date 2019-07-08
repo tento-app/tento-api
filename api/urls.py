@@ -29,3 +29,9 @@ urlpatterns = [
     # path('',include('gql.urls')),
     path('', csrf_exempt(FileUploadGraphQLView.as_view(graphiql=False))),
 ]
+
+import django.views.static
+import api.settings
+urlpatterns += [
+   path('static/', django.views.static.serve, {'document_root': api.settings.STATIC_ROOT, 'show_indexes': api.settings.DEBUG})
+]
